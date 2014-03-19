@@ -5,9 +5,9 @@ var fs = require('fs');
 var app = express(); 
 
 var sslOptions = {
-  key: fs.readFileSync('./server.key'),
-  cert: fs.readFileSync('./server.crt'),
-  ca: fs.readFileSync('./ca.crt'),
+  key: fs.readFileSync('../server.key'),
+  cert: fs.readFileSync('../server.crt'),
+  ca: fs.readFileSync('../ca.crt'),
   requestCert: true,
   rejectUnauthorized: false
 };
