@@ -1,0 +1,26 @@
+body {
+	background-color: #333;
+	color: #ccc
+}
+
+.is-red-true {
+	background-color: red;
+	color: black;
+}
+
+.isBlue {
+	color: blue;
+}
+
+.isYellow {
+	color: yellow;
+}
+
+table {
+	border-collapse:collapse;
+}
+
+table,th, td {
+	border: 1px solid #ccc;
+	padding:7px;
+}

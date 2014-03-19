@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html ng-app ="app1">
+  
+	<head>
+		<title>Angular!</title>
+		<link rel="stylesheet" type="text/css" href="angular.css">
+	</head>
+  
+<body>
+	
+	<div class="container"  ng-controller="SimpleController">
+		
+		
+		<input type="text" ng-model="name" />  {{ name }}
+		
+		<ul>
+			<li ng-repeat="person in people | filter:name | orderBy: 'name' "> {{person.name}} - {{person.job}}</li>
+		</ul>
+	
+	</div>
+	
+	<script src="angular.min.js"></script>
+	<script src="angular-route.min.js"></script>
+	<script src="myAngular.js"></script>
+
+</body>
+
+ </html>

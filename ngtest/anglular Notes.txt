@@ -1,0 +1,33 @@
+Angular Elements
+Directives
+Angular Expressions
+Controllers
+Services
+Filters
+Views - NO! It's just HTML 
+$scope
+$http
+$rescource
+
+
+.........................
+Invoking Angular
+1. Load js
+2. use ng-app directive (tell angular what part of DOM to use)
+
+Model View Controller - All Agular apps have: 
+* A model containing data, representing current state of app
+* Views that display this data
+* Controllers that manage the relationship between model and views
+
+ng-change(callback) (when field changes call callback)
+ng-submit (a form attr, set equal to callback, default post will be stopped )
+ng-click (attr, set equal to a callback for click event)
+
+ng-repeat = "thing in things" (make elements by iterating trhough an object) 
+$first, $middle, $last, $repeat (some usable variables during the iteration)
+
+
+$scope.$watch(thingToWatch, callback) (watch for var change then run callback)
+
+
