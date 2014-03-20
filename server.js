@@ -5,7 +5,7 @@ var app = express();
 var server = {};
 
 var data = {};
-	data.from = 'Toby';
+	data.from = 'Bob';
 	data.to = 'Dave';
 	data.subject = 'Happy New Year!';
 	data.message = 'Just wanted to wish you a Happy New Year!';
@@ -30,10 +30,10 @@ function onListening() {
 
 app.use(express.logger('dev'));
 app.use(express.json()); 
-app.use(express.static('public/'));
-app.use(express.favicon("public/skull.ico")); 
-app.use('/enigmaX', express.static('enigmaX/'));
-app.post('/', handlePost); 
+app.use(express.static(__dirname + '/public/'));
+app.use(express.favicon(__dirname + "/public/skull.ico")); 
+app.use('/ajax', express.static(__dirname + '/ajax/'));
+app.post('/ajax', handlePost); 
 
 
 app.set('port', 3000);
