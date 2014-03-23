@@ -1,5 +1,6 @@
 var express = require('express');
 var https = require('https');
+var http = require('http'); 
 var fs = require('fs');
 
 var app = express(); 
@@ -12,13 +13,21 @@ var sslOptions = {
   rejectUnauthorized: false
 };
 
+function requireHTTPS(req, res, next) {
+    if (!req.secure) {
+        //FYI this should work for local development as well
+        return res.redirect('https://' + req.get('host') + req.url);
+    }
+    next();
+}
 
 app.use(express.logger('dev'));
+app.use(requireHTTPS);
 app.use(express.static('enigmaX/'));
 
+http.createServer(app).listen(80);
 
-
-https.createServer(sslOptions,app).listen('3000', function(){
+https.createServer(sslOptions,app).listen(443, function(){
   console.log("Secure Express server listening on port 3000");
 });
 
