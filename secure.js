@@ -25,10 +25,11 @@ app.use(express.logger('dev'));
 app.use(requireHTTPS);
 app.use(express.static('enigmaX/'));
 
-http.createServer(app).listen(80);
+http.createServer(app).listen(3000);
 
-https.createServer(sslOptions,app).listen(443, function(){
-  console.log("Secure Express server listening on port 3000");
+https.createServer(sslOptions,app).listen(3465, function(){
+  console.log("Secure Express server listening on port 3465");
+  console.log("Redirect server running on port 3000"); 
 });
 
 
