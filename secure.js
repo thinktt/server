@@ -16,8 +16,9 @@ var sslOptions = {
 function requireHTTPS(req, res, next) {
     if (!req.secure) {
         //FYI this should work for local development as well
-        return res.redirect('https://' + req.get('host') + req.url);
-    }
+        //return res.redirect('https://' + req.get('host') + req.url);
+    	return res.redirect('https://72.47.189.109:8888' + req.url);
+       }
     next();
 }
 
