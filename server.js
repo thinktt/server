@@ -1,54 +1,67 @@
 var express = require('express');
-var enigmaX = require('./enigmax');
-var key = enigmaX.newKey();
+var https = require('https');
+var http = require('http'); 
+var fs = require('fs');
+
 var app = express(); 
-var server = {};
 
-var data = {};
-	data.from = 'Bob';
-	data.to = 'Dave';
-	data.subject = 'Happy New Year!';
-	data.message = 'Just wanted to wish you a Happy New Year!';
-	data.num = 10;
+var sslOptions = {
+  key: fs.readFileSync('../server.key'),
+  cert: fs.readFileSync('../server.crt'),
+  ca: fs.readFileSync('../ca.crt'),
+  requestCert: true,
+  rejectUnauthorized: false
+};
 
-
-function handlePost(request, response, next) {
-	console.log(request.body.message);
-	data.message = enigmaX.crypt(request.body.message);
-	response.send(data);
-	//next(); 
+function requireHTTPS(req, res, next) {
+    if (!req.secure) {
+        //FYI this should work for local development as well
+        //return res.redirect('https://' + req.get('host') + req.url);
+    	return res.redirect('https://72.47.189.109:8888' + req.url);
+       }
+    next();
 }
 
+function handlePost(request, response, next) {
+  var data = {};
+  console.log(request.body.message);
+  data.message = 'You said:\n' + request.body.message;
+  response.send(data);
+}
+
+app.use(express.logger('dev'));
+app.use(requireHTTPS);
+app.use(express.json()); 
+app.use(express.static('enigmaX/'));
+app.use('/ajax', express.static('ajax/'));
+app.post('/ajax', handlePost); 
+
+http.createServer(app).listen(3000);
+
+https.createServer(sslOptions,app).listen(3465, function(){
+  console.log("Secure Express server listening on port 3465");
+  console.log("Redirect server running on port 3000"); 
+});
 
 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 function onListening() {
 	console.log('Sever running on port ' + app.get('port'));
 
 }
-
-
-
-app.use(express.logger('dev'));
-app.use(express.json()); 
-app.use(express.static(__dirname + '/public/'));
-app.use(express.favicon(__dirname + "/ajax/skull.ico")); 
-app.use('/ajax', express.static(__dirname + '/ajax/'));
-app.post('/ajax', handlePost); 
-
-
 app.set('port', 3000);
 app.listen(app.get('port'), onListening);
-
-
-
-
-/*function parseText(req, res, next){
-  if (req.is('text/*')) {
-    req.text = '';
-    req.setEncoding('utf8');
-    req.on('data', function(chunk){ req.text += chunk; });
-    req.on('end', next);
-  } else {
-    next();
-  }
-}*/
+*/
