@@ -22,9 +22,19 @@ function requireHTTPS(req, res, next) {
     next();
 }
 
+function handlePost(request, response, next) {
+  var data = {};
+  console.log(request.body.message);
+  data.message = 'You said:\n' + request.body.message;
+  response.send(data);
+}
+
 app.use(express.logger('dev'));
 app.use(requireHTTPS);
+app.use(express.json()); 
 app.use(express.static('enigmaX/'));
+app.use('/ajax', express.static('ajax/'));
+app.post('/ajax', handlePost); 
 
 http.createServer(app).listen(3000);
 
