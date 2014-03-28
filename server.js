@@ -43,25 +43,4 @@ https.createServer(sslOptions,app).listen(3465, function(){
   console.log("Redirect server running on port 3000"); 
 });
 
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-function onListening() {
-	console.log('Sever running on port ' + app.get('port'));
-
-}
-app.set('port', 3000);
-app.listen(app.get('port'), onListening);
-*/
+ 
