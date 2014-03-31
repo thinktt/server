@@ -17,24 +17,45 @@ function requireHTTPS(req, res, next) {
     if (!req.secure) {
         //FYI this should work for local development as well
         //return res.redirect('https://' + req.get('host') + req.url);
-    	return res.redirect('https://72.47.189.109:8888' + req.url);
+        return res.redirect('https://72.47.189.109:8888' + req.url);
        }
     next();
 }
 
-function handlePost(request, response, next) {
+function requireAuth(req, res, next) {
+  return res.redirect('https://' + req.headers.host  + '/login/');
+}
+
+function ajaxPost(request, response, next) {
   var data = {};
   console.log(request.body.message);
   data.message = 'You said:\n' + request.body.message;
   response.send(data);
 }
 
+function loginPost(request, response, next) {
+  var data = {message:'Howdy!'};
+  response.send(data);
+}
+
+
 app.use(express.logger('dev'));
 app.use(requireHTTPS);
-app.use(express.json()); 
-app.use(express.static('enigmaX/'));
+app.use(express.cookieParser()); 
+app.use(express.json());
+
+app.use('/login', express.static('login/'));
+app.post('/login', loginPost);
+app.use(requireAuth); 
+
+app.use('/', express.static('enigmaX/'));
+
 app.use('/ajax', express.static('ajax/'));
-app.post('/ajax', handlePost); 
+app.post('/ajax', ajaxPost); 
+
+
+
+
 
 http.createServer(app).listen(3000);
 
