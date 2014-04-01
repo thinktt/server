@@ -18,24 +18,38 @@ function requireHTTPS(req, res, next) {
         //FYI this should work for local development as well
         //return res.redirect('https://' + req.get('host') + req.url);
         return res.redirect('https://72.47.189.109:8888' + req.url);
-       }
+    }
     next();
 }
 
 function requireAuth(req, res, next) {
-  return res.redirect('https://' + req.headers.host  + '/login/');
+   
+  if(req.cookies.SID !== "12345678") { 
+     return res.redirect('https://' + req.headers.host  + '/login/');
+  }
+  next(); 
 }
 
-function ajaxPost(request, response, next) {
+function ajaxPost(req, res, next) {
   var data = {};
-  console.log(request.body.message);
-  data.message = 'You said:\n' + request.body.message;
-  response.send(data);
+  console.log(req.body.message);
+  data.message = 'You said:\n' + req.body.message;
+  res.send(data);
 }
 
-function loginPost(request, response, next) {
-  var data = {message:'Howdy!'};
-  response.send(data);
+function loginPost(req, res, next) {
+  var isValid = false;
+  
+  var userCredentials = {
+    'legolas':'xyzzy'
+  };
+  
+  if(userCredentials[req.body.username] === req.body.password){
+    res.cookie('SID', '12345678', {maxAge: 900000, httpOnly: true });
+    isValid = true;
+  }
+  
+  res.send(isValid);
 }
 
 
