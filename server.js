@@ -2,6 +2,7 @@ var express = require('express');
 var https = require('https');
 var http = require('http'); 
 var fs = require('fs');
+var bcrypt = require('bcryptjs');
 
 var app = express(); 
 
@@ -43,7 +44,13 @@ function loginPost(req, res, next) {
   var userCredentials = {
     'legolas':'xyzzy'
   };
+
+  var salt = bcrypt.genSaltSync(10);
+  var hash = bcrypt.hashSync("xyzzy", salt);
   
+  console.log(bcrypt.genSaltSync(5));
+
+
   if(userCredentials[req.body.username] === req.body.password){
     res.cookie('SID', '12345678', {maxAge: 900000, httpOnly: true });
     isValid = true;
