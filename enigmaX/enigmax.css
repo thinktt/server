@@ -28,9 +28,10 @@ body {
 	font-family: Tahoma, Verdana, sans-serif, icomoon;
 	/*font-family: Tahoma, Verdana, sans-serif, icomoon;*/
 	color: #ccc;
-	background-color: #333;
+	background-color: transparent;
 	overflow:hidden;
 	overflow-y:auto; 
+	background-image:url('background.jpg');
 	/*webkit-font-smoothing: antialiased;*/
 }
 
@@ -133,7 +134,8 @@ input:focus, select:focus, textarea:focus {
 	margin: 0 auto;
 	border: 2px solid;
 	color: #ccc;
-	background-color: #333;
+	background-color: transparent;
+
 	
 	font-size: 1.75em;
 	font-weight: 100;
@@ -179,7 +181,7 @@ input:focus, select:focus, textarea:focus {
 	height: 475px;
 	margin: 0 auto;
 	color: #ccc;
-	background-color: #333;
+	background-color: transparent;
 	font-size: .9em;
 	line-height: 1.1em;
 	letter-spacing: .1em;
@@ -321,7 +323,7 @@ a:hover, a:active {
 	margin: 0 auto;
 	
 	color: #ccc;
-	background-color: #333;
+	background-color: transparent;
 	font-size: 1em;
 	line-height: 1em;
 	letter-spacing: .1em;
