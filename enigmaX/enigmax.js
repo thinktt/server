@@ -1211,6 +1211,7 @@ function EnigmaXMachine(){
 
 //.................DOM Handlers.....................
 var body = document.body; 
+var hiddenBody = document.getElementById("hiddenBody");
 var mainDiv = document.getElementById("mainDiv");
 var messageDiv = document.getElementById("messageDiv");
 var loadDiv = document.getElementById("loadDiv");
@@ -1245,7 +1246,35 @@ var inputKeyBoxDefault = "\n« paste your key here and click load »";
 var noXKeyBoxDefault =  "\nJKL-AAA-AAA-ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
+//.........Media resources..............................
+var clickclackSound = new Audio('./sounds/clickclack.mp3');
+var clickSound = new Audio('./sounds/click.mp3');
+var buzzSound = new Audio('./sounds/buzz.mp3');
+var rotorSound = new Audio('./sounds/rotors.mp3');
+var dropSound = new Audio('./sounds/drop.mp3');
 
+//only used to tell when the background
+//image resource has actually loaded
+var bgImg = new Image();
+bgImg.src = 'background.jpg';
+
+
+/*
+//..........Background Loader..............
+//this scrypt waits for the background image to 
+//load then puts it on the page
+
+var int = setInterval(function() {
+    if (bgImg.complete) {
+        clearInterval(int);
+        body.style.backgroundImage = 'url(background.jpg)';
+    }
+}, 50);
+
+*/
+
+
+//........Miselaneous Setup Stuff..............
 messageBox.value = messageBoxDefault;
 inputKeyBox.value = inputKeyBoxDefault;
 
@@ -1253,6 +1282,10 @@ inputKeyBox.value = inputKeyBoxDefault;
 enigmaXButton.style.color = "#333";
 enigmaXButton.style.backgroundColor = "#ccc";
 enigmaXButton.style.borderColor = "#ccc";
+
+
+
+
 
 //...............Message Box Adjuster...................
 //confusing little script that gets the view port height
@@ -1304,13 +1337,6 @@ var thinkDingSet ="♆☢♗☯☠✈♞❂☭✂☏☾♠✿☮❉♕✪♙☸�
 var intervalHandle;
 
 
-var clickclackSound = new Audio('./sounds/clickclack.mp3');
-var clickSound = new Audio('./sounds/click.mp3');
-var buzzSound = new Audio('./sounds/buzz.mp3');
-var rotorSound = new Audio('./sounds/rotors.mp3');
-var dropSound = new Audio('./sounds/drop.mp3');
-
-
 var startEnigmaX = function() {
 	enigmaXMachine = new EnigmaXMachine();
 	keyBox.value =  enigmaXMachine.newKey();
@@ -1329,7 +1355,7 @@ var checkProgress = function()
 			startEnigmaX();
 		}
 	else {
-			keyBox.value = "Generating Key\n" + thinkDingSet.slice(0,4) + "\nplease move your mouse around";
+			keyBox.value = "Generating Random Key\n" + thinkDingSet.slice(0,4) + "\nplease move your mouse around";
 			thinkDingSet = thinkDingSet + thinkDingSet[0];
 			thinkDingSet = thinkDingSet.slice(1);
 		}
@@ -1337,6 +1363,25 @@ var checkProgress = function()
 
 
 window.onload = function(){
+	opacity = 0; 
+
+	var fadeInterval = setInterval(function() {
+	
+    //once the background image is availabe 
+    //start faiding everything in
+    if (bgImg.complete) {
+    	opacity = opacity + 0.1; 
+    	hiddenBody.style.opacity = opacity;
+    	console.log(hiddenBody.style.opacity); 
+    	
+    	if(hiddenBody.style.opacity >= 1) {
+       		clearInterval(fadeInterval);
+       	}
+        
+    }
+	}, 50);
+
+
 	if(sjcl.random.getProgress(8) < 1){
 		intervalHandle = setInterval(checkProgress, 200);
 		messageBox.value = "waiting for key to load...";
