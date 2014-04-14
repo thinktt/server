@@ -88,7 +88,7 @@ function checkCredentials(username, password, callback) {
 	    			return; 
 				}	
     			else {
-    				callback("invalid password"); 
+    				callback("invalid password", user.username); 
     				return; 
     			}
     		});
@@ -152,46 +152,27 @@ function loadCurrentSessions() {
 	
 	Session.find( {exp: {$gt: Date.now()} }, function(err, sessions) {
 		currentSessions = sessions;
-		console.log(currentSessions); 
+		
 	});
 
 }
 
-
+//when loading the module go ahead and load
+//any old sessions that have not expired
 loadCurrentSessions(); 
-console.log(currentSessions); 
-
 
 /*
-setTimeout( function() {
-	console.log(checkSession('U+hsKjamsnCFKUwFAk+2WXyD1Rm1rCm0NbXlsad/tXA='));
-},
-2000); 
-
-
 checkCredentials('gandalf', 'xyzzy', function(status, username) {
 	console.log('checking ' + username + ': ' + status);
 	makeSession(username, function(session) {
 		console.log(session); 
 	});
 });
-
-
-addCredentials('gandalf', 'xyzzy', function(status) {
-	console.log('adding gandalf: ' + status); 
-});
-
-
-checkCredentials('bilbo', 'xyzzy', function(status) {
-	console.log('checking bilbo: ' + status); 
-});
-
-checkCredentials('gandalf', 'xyzzy', function(status) {
-	console.log('checking gandalf: ' + status); 
-});
-
-crypto.randomBytes(32, function(err, buf) {
-    console.log(buf.toString('base64'));
-});
-
 */
+
+exports.addCredentials = addCredentials;
+exports.checkCredentials  = checkCredentials;
+exports.makeSession = makeSession; 
+exports.checkSession = checkSession;
+exports.loadCurrentSessions = loadCurrentSessions;
+

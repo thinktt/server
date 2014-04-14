@@ -3,6 +3,7 @@ var https = require('https');
 var http = require('http'); 
 var fs = require('fs');
 var bcrypt = require('bcryptjs');
+var auth = require('./authmgmt.js'); 
 
 var app = express(); 
 
@@ -24,8 +25,12 @@ function requireHTTPS(req, res, next) {
 }
 
 function requireAuth(req, res, next) {
-   
-  if(req.cookies.SID !== "12345678") { 
+
+  //avoid undefined cookie SID
+  req.cookies.SID = req.cookies.SID || ''; 
+  
+  //if cookies session id is not valid redirect to login page
+  if( auth.checkSession(req.cookies.SID) !== 'session is valid') { 
      return res.redirect('https://' + req.headers.host  + '/login/');
   }
   next(); 
@@ -40,23 +45,28 @@ function ajaxPost(req, res, next) {
 
 function loginPost(req, res, next) {
   var isValid = false;
+  auth.checkCredentials(req.body.username, req.body.password, function(status, username) {
+    console.log(status); 
+    auth.makeSession(username, function(session) {
+
+      if(status === 'user validated') {
+        res.cookie('SID', session.id, {maxAge: 3600000, httpOnly: true});
+        res.send(true);
+      } 
+      else {
+        res.send(false); 
+      }
+
+    });
   
-  var userCredentials = {
-    'legolas':'xyzzy'
-  };
+  }); 
 
-  var salt = bcrypt.genSaltSync(10);
-  var hash = bcrypt.hashSync("xyzzy", salt);
-  
-  console.log(bcrypt.genSaltSync(5));
-
-
+  /*
   if(userCredentials[req.body.username] === req.body.password){
     res.cookie('SID', '12345678', {maxAge: 900000, httpOnly: true });
     isValid = true;
   }
-  
-  res.send(isValid);
+  */
 }
 
 
