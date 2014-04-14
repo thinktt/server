@@ -1,22 +1,30 @@
 var mongoose = require('mongoose'); 
 var bcrypt = require('bcryptjs');
+var crypto = require('crypto'); 
 var db; 
 
+var currentSessions = []; 
 
-mongoose.connect('mongodb://localhost/users');
-db = mongoose.connection;
 
 var userSchema = mongoose.Schema({	
 	username: {type: String, lowercase: true}, 
 	passHash: String,
-	session: {
-		id: String,
-		experation: Number
-	}	
+});
+
+var sessionSchema = mongoose.Schema({	
+	username: {type: String, lowercase: true}, 
+	id: String,
+	exp: Number
 });
 
 var User = mongoose.model('User', userSchema); 
+var Session = mongoose.model('Session', sessionSchema);
 
+
+
+//connect to mongodb
+mongoose.connect('mongodb://localhost/users');
+db = mongoose.connection;
 
 
 function addCredentials(username, password, callback) {
@@ -36,12 +44,12 @@ function addCredentials(username, password, callback) {
 				//when salt is done hash the password
 		    	bcrypt.hash(password, salt, function(err, hash) {
 		        	
-		        	//whe hash is done store new credentials in db
+		        	//when hash is done store new credentials in db
 		        	user.passHash = hash; 
 		        	user.save(function (err) {
 						if(!err) {
-							console.log('credentials stored'); 
-							return callback('user added'); 
+							callback('user added');
+							return; 
 						}
 					});
 
@@ -50,24 +58,40 @@ function addCredentials(username, password, callback) {
 		}
 		//otherwise user already exist
 		else {
-	       	return callback('user taken');
+	       	callback('user taken');
+	       	return; 
 	    }
-}
-	    
 
-/*function checkCredentials(username, password, callback) {
+	});
+}
+
+
+function checkCredentials(username, password, callback) {
 	var user;
 
 	//get the user information
 	User.find({username: username}, function(error, userData) {
-		
+
 		//does the user exist
 		if(userData.length === 0) {
-			return callback('no such user');
+			callback('no such user');
+			return; 
 		}
 		else {
-			user = userData[0];  
-			return callback(user.username + ' exist!'); 
+			user = userData[0]; 
+			//check the password 
+			bcrypt.compare(password, user.passHash, function(err, res) {
+				if(res === true) { 
+
+					//respond with the session information
+					callback('user validated', user.username); 
+	    			return; 
+				}	
+    			else {
+    				callback("invalid password"); 
+    				return; 
+    			}
+    		});
 		}
 	
 	});
@@ -76,65 +100,98 @@ function addCredentials(username, password, callback) {
 
 
 
-checkCredentials('legolas', 'xyzzy', function(status) {
-	console.log(status); 
-});
+function makeSession(username, callback) {
+	var session = new Session();
 
-*/
+	session.username = username; 
 
+	//generate a sessionId 
+	crypto.randomBytes(32, function(err, buf) {
+		session.id = buf.toString('base64');
 
+		//generate a session experation
+		//an hour from the current time 
+		session.exp = (Date.now() + 3600000);
+		
+		//put session in db
+		session.save(); 
 
-/*
-addCredentials('frodo', 'xyzzy', function(status){
-	console.log(status); 
-}); 
+		//put session in cashed sessions
+		currentSessions.push(session); 
 
-	//check password
-	
-	//create sessionID
-	
-
-	//generate a session ID by stringing 10 
-	//bcrypt salts together, only taking the
-	//random string part 
-	//for(i=0; i<10; i++) {
-	//		user.sessionID = user.sessionID + bcrypt.genSaltSync(5).substr(7);
-	//}
-
-
-	//generate a session experation
-	//an hour from the current time 
-	//user.sessionExp = (Date.now() + 3600000);
-
-
-	//return sesionID 
-
-    //}
-    //	});
-
-User.find({username: 'toby'}, function(error, data){
-    console.log(data);
- });
-
-
-function checkSessionID(sessionID) {
-
+		callback(session); 
+	});
 }
 
 
 
+function checkSession(sessionId) {
+	var i;
 
-console.log(user); 
-console.log('username: ', user.username);
-console.log('\nhash: ', user.passHash); 
-console.log('\nsessionID:\n', user.sessionID);
-console.log('\nsessionExp:', user.sessionExp);
+	for(i=0; i < currentSessions.length; i++) {
+		if(currentSessions[i].id === sessionId) {
+			break;
+		}
+	}
+
+	
+	if(i >= currentSessions.length) {
+		return 'session not found'; 
+	} 
+	else if(currentSessions[i].exp < Date.now()) {
+		return 'session is expired'; 
+	}
+	else {
+		return 'session is valid'; 
+	}
+
+}
 
 
+function loadCurrentSessions() {
+	
+	Session.find( {exp: {$gt: Date.now()} }, function(err, sessions) {
+		currentSessions = sessions;
+		console.log(currentSessions); 
+	});
+
+}
 
 
-//check credentials (username, password)
-//add credentials (username, password)
-//check username
-//check sessionID 
+loadCurrentSessions(); 
+console.log(currentSessions); 
+
+
+/*
+setTimeout( function() {
+	console.log(checkSession('U+hsKjamsnCFKUwFAk+2WXyD1Rm1rCm0NbXlsad/tXA='));
+},
+2000); 
+
+
+checkCredentials('gandalf', 'xyzzy', function(status, username) {
+	console.log('checking ' + username + ': ' + status);
+	makeSession(username, function(session) {
+		console.log(session); 
+	});
+});
+
+
+addCredentials('gandalf', 'xyzzy', function(status) {
+	console.log('adding gandalf: ' + status); 
+});
+
+
+checkCredentials('bilbo', 'xyzzy', function(status) {
+	console.log('checking bilbo: ' + status); 
+});
+
+checkCredentials('gandalf', 'xyzzy', function(status) {
+	console.log('checking gandalf: ' + status); 
+});
+
+crypto.randomBytes(32, function(err, buf) {
+    console.log(buf.toString('base64'));
+});
+
 */
