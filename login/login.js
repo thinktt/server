@@ -1,12 +1,12 @@
 
-
+//........................Log In Request...............
 $("#logIn #mainButton").click(function(event) {
 	var data = {}, 
 		usernameRegEx = /^[a-z0-9_-]{3,16}$/,
 		passwordRegEx = /^[\u0020-\u007E]{8,256}$/;
 	
 	//load the data
-	data.username = $("#logIn input[name=username]").val();
+	data.username = $("#logIn input[name=username]").val().toLowerCase();
 	data.password = $("#logIn input[name=password]").val();
 	data.postId = 'logIn'; 
 
@@ -33,10 +33,10 @@ $("#logIn #mainButton").click(function(event) {
 		data:  JSON.stringify(data),
 		contentType: 'application/json; charset=utf-8',
 		success: function (res) {
-			if(res === true) {
+			if(res === 'user validated') {
 				$("#messageArea").html('You are now logged in'); 
 			}
-			else {
+			else if(res === 'invalid login'){
 				$("#messageArea").html('Invalid username or password'); 
 			} 
 		}
@@ -44,6 +44,8 @@ $("#logIn #mainButton").click(function(event) {
 
 });
 
+
+//.......................Registration Request.......................
 $("#register #mainButton").click(function(event) {
 
 	var data = {}, confirm,
@@ -51,7 +53,7 @@ $("#register #mainButton").click(function(event) {
 		passwordRegEx = /^[\u0020-\u007E]{8,256}$/;
 	
 	//load the data
-	data.username = $("#register input[name=username]").val();
+	data.username = $("#register input[name=username]").val().toLowerCase();
 	data.password = $("#register input[name=password]").val();
 	confirm = $("#register input[name=confirm]").val();
 	data.postId = 'register'; 
@@ -84,11 +86,16 @@ $("#register #mainButton").click(function(event) {
 			data:  JSON.stringify(data),
 			contentType: 'application/json; charset=utf-8',
 			success: function (res) {
-				$("#messageArea").html('Attempting to register account'); 
+				if(res === 'user added') {
+					$("#messageArea").html(data.username +' now registered'); 
+				}
+				else if(res === 'user taken') {
+					$("#messageArea").html('User name already taken'); 
+				}
 			}
 		}); 
 	}
-	else {
+	else if(data.password !== confirm) {
 		$("#messageArea").html("Passwords don't match"); 
 	}
 });

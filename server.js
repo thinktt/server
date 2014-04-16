@@ -76,11 +76,11 @@ function loginPost(req, res, next) {
         if(status === 'user validated') {
           //send cookie with sessionId
           res.cookie('sessionId', session.id, {maxAge: 3600000, httpOnly: true});
-          res.send(true);
+          res.send('user validated');
         } 
         else {
           //reply with invalid login
-          res.send(false); 
+          res.send('invalid login'); 
         }
       });
     });
@@ -92,11 +92,11 @@ function loginPost(req, res, next) {
     auth.addCredentials(req.body.username, req.body.password, function(status) {
       //user was added
       if(status === 'user added') {
-        res.send(true); 
+        res.send('user added'); 
       } 
       //could not add user, usrname already exist
       else if (status === 'user taken') {
-        res.send(false);
+        res.send('user taken');
       }
 
     }); 
