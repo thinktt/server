@@ -26,11 +26,11 @@ function requireHTTPS(req, res, next) {
 
 function requireAuth(req, res, next) {
 
-  //avoid undefined cookie SID
-  req.cookies.SID = req.cookies.SID || ''; 
+  //avoid undefined cookie sessionId
+  req.cookies.sessionId = req.cookies.sessionId || ''; 
   
   //if cookies session id is not valid redirect to login page
-  if( auth.checkSession(req.cookies.SID) !== 'session is valid') { 
+  if( auth.checkSession(req.cookies.sessionId) !== 'session is valid') { 
      return res.redirect('https://' + req.headers.host  + '/login/');
   }
   next(); 
@@ -43,25 +43,65 @@ function ajaxPost(req, res, next) {
   res.send(data);
 }
 
+
+function validatePost(req, res, next) {
+ var usernameRegEx = /^[a-z0-9_-]{3,16}$/,
+     passwordRegEx = /^[\u0020-\u007E]{8,256}$/;
+
+  if(req.body.postId === 'logIn' || 'register') {
+    if(!usernameRegEx.test(req.body.username)) {
+      res.send({reply: 'invalid post'});
+    }
+    if(!passwordRegEx.test(req.body.password)) {
+      res.send({reply:'invalid post'}); 
+    }
+  } 
+  else {
+    res.send({reply:'invalid poast'});
+  }
+
+  next(); 
+}
+
+
 function loginPost(req, res, next) {
-  
-  if(req.body.type === 'logIn') {
+
+  // if this is a logIn post request
+  if(req.body.postId === 'logIn') {
+
+    //check the usrname and password
     auth.checkCredentials(req.body.username, req.body.password, function(status, username) {
+      //if they're valid make a new session
       auth.makeSession(username, function(session) {
         if(status === 'user validated') {
-          res.cookie('SID', session.id, {maxAge: 3600000, httpOnly: true});
+          //send cookie with sessionId
+          res.cookie('sessionId', session.id, {maxAge: 3600000, httpOnly: true});
           res.send(true);
         } 
         else {
+          //reply with invalid login
           res.send(false); 
         }
       });
     });
   } 
-  else if(req.body.type === 'register') {
-    res.send('Account not reistered'); 
+
+  //if this is a registration post request
+  if(req.body.postId === 'register') {
+    //attempt to add the credentials to the database
+    auth.addCredentials(req.body.username, req.body.password, function(status) {
+      //user was added
+      if(status === 'user added') {
+        res.send(true); 
+      } 
+      //could not add user, usrname already exist
+      else if (status === 'user taken') {
+        res.send(false);
+      }
+
+    }); 
+
   }
- 
 }
 
 
@@ -71,6 +111,8 @@ app.use(express.cookieParser());
 app.use(express.json());
 
 app.use('/login', express.static('login/'));
+
+app.post('/*', validatePost); 
 app.post('/login', loginPost);
 app.use(requireAuth); 
 
