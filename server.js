@@ -44,29 +44,24 @@ function ajaxPost(req, res, next) {
 }
 
 function loginPost(req, res, next) {
-  var isValid = false;
-  auth.checkCredentials(req.body.username, req.body.password, function(status, username) {
-    console.log(status); 
-    auth.makeSession(username, function(session) {
-
-      if(status === 'user validated') {
-        res.cookie('SID', session.id, {maxAge: 3600000, httpOnly: true});
-        res.send(true);
-      } 
-      else {
-        res.send(false); 
-      }
-
-    });
   
-  }); 
-
-  /*
-  if(userCredentials[req.body.username] === req.body.password){
-    res.cookie('SID', '12345678', {maxAge: 900000, httpOnly: true });
-    isValid = true;
+  if(req.body.type === 'logIn') {
+    auth.checkCredentials(req.body.username, req.body.password, function(status, username) {
+      auth.makeSession(username, function(session) {
+        if(status === 'user validated') {
+          res.cookie('SID', session.id, {maxAge: 3600000, httpOnly: true});
+          res.send(true);
+        } 
+        else {
+          res.send(false); 
+        }
+      });
+    });
+  } 
+  else if(req.body.type === 'register') {
+    res.send('Account not reistered'); 
   }
-  */
+ 
 }
 
 
