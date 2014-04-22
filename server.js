@@ -3,7 +3,9 @@ var https = require('https');
 var http = require('http'); 
 var fs = require('fs');
 var bcrypt = require('bcryptjs');
+var MongoStore = require('connect-mongo')(express);
 var auth = require('./authmgmt.js'); 
+
 
 var app = express(); 
 
@@ -15,6 +17,13 @@ var sslOptions = {
   rejectUnauthorized: false
 };
 
+var sessionOptions = {
+  secret: '1234567890QWERTY',
+  store: new MongoStore({db: 'users'})
+};
+
+
+//.................Require HTTPS.............................
 function requireHTTPS(req, res, next) {
     if (!req.secure) {
         //FYI this should work for local development as well
@@ -24,6 +33,8 @@ function requireHTTPS(req, res, next) {
     next();
 }
 
+
+//.................Requrire Auth.............................
 function requireAuth(req, res, next) {
 
   //avoid undefined cookie sessionId
@@ -36,6 +47,7 @@ function requireAuth(req, res, next) {
   next(); 
 }
 
+//.............Handle Post From Ajax Test Page...................
 function ajaxPost(req, res, next) {
   var data = {};
   console.log(req.body.message);
@@ -44,6 +56,7 @@ function ajaxPost(req, res, next) {
 }
 
 
+//..................Validate Any Post Req......................
 function validatePost(req, res, next) {
  var usernameRegEx = /^[a-z0-9_-]{3,16}$/,
      passwordRegEx = /^[\u0020-\u007E]{8,256}$/;
@@ -64,6 +77,7 @@ function validatePost(req, res, next) {
 }
 
 
+//..................Handle Login Post Request.................
 function loginPost(req, res, next) {
 
   // if this is a logIn post request
@@ -105,10 +119,13 @@ function loginPost(req, res, next) {
 }
 
 
+
+//..............The Express Stack.....................
 app.use(express.logger('dev'));
 app.use(requireHTTPS);
 app.use(express.cookieParser()); 
 app.use(express.json());
+app.use(express.session(sessionOptions));
 
 app.use('/login', express.static('login/'));
 
@@ -125,6 +142,10 @@ app.post('/ajax', ajaxPost);
 
 
 
+
+
+
+//........   Start The Servers..........................
 http.createServer(app).listen(3000);
 
 https.createServer(sslOptions,app).listen(3465, function(){
