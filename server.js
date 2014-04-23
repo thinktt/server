@@ -23,7 +23,6 @@ var sessionOptions = {
   store: new MongoStore({db: 'users'})
 };
 
-console.log(sessionOptions.secret); 
 
 
 var userSchema = mongoose.Schema({  
@@ -172,12 +171,14 @@ app.use(requireHTTPS);
 app.use(express.json());
 app.use(express.cookieParser()); 
 app.use(express.session(sessionOptions));
+app.use(express.favicon("ajax/skull.ico")); 
 
 app.use('/login', express.static('login/'));
 app.post('/*', validatePost); 
 
 app.post('/login', loginPost);
 app.use(requireAuth); 
+
 
 app.use('/', express.static('enigmaX/'));
 app.use('/ajax', express.static('ajax/'));
