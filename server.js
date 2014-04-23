@@ -19,9 +19,11 @@ var sslOptions = {
 };
 
 var sessionOptions = {
-  secret: '1234567890QWERTY',
+  secret: fs.readFileSync('../session.key', 'ascii'),
   store: new MongoStore({db: 'users'})
 };
+
+console.log(sessionOptions.secret); 
 
 
 var userSchema = mongoose.Schema({  
@@ -93,17 +95,7 @@ function validatePost(req, res, next) {
 function loginPost(req, res, next) {
   var username = req.body.username,
       password = req.body.password;
-      
   
-  /*//make sure user session vars are defined 
-  if(!req.session.userStatus) {
-    res.session.userStatus = 'loggedOut';
-  }
-  if(!req.session.user){
-    res.session.user = null;
-  }
-  */
-
   //if this is a logIn post request
   if(req.body.postId === 'logIn') {
     
