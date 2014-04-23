@@ -4,7 +4,8 @@ var http = require('http');
 var fs = require('fs');
 var bcrypt = require('bcryptjs');
 var MongoStore = require('connect-mongo')(express);
-var auth = require('./authmgmt.js'); 
+var mongoose = require('mongoose'); 
+var bcrypt = require('bcryptjs');
 
 
 var app = express(); 
@@ -23,6 +24,17 @@ var sessionOptions = {
 };
 
 
+var userSchema = mongoose.Schema({  
+  username: {type: String, lowercase: true}, 
+  passHash: String,
+});
+var User = mongoose.model('User', userSchema); 
+
+//connect to mongodb
+mongoose.connect('mongodb://localhost/users');
+db = mongoose.connection;
+
+
 //.................Require HTTPS.............................
 function requireHTTPS(req, res, next) {
     if (!req.secure) {
@@ -37,11 +49,11 @@ function requireHTTPS(req, res, next) {
 //.................Requrire Auth.............................
 function requireAuth(req, res, next) {
 
-  //avoid undefined cookie sessionId
-  req.cookies.sessionId = req.cookies.sessionId || ''; 
+  //avoid undefined user status
+  req.session.userStatus = req.session.userStatus || 'loggedOut'; 
   
   //if cookies session id is not valid redirect to login page
-  if( auth.checkSession(req.cookies.sessionId) !== 'session is valid') { 
+  if( req.session.userStatus !== 'loggedIn') { 
      return res.redirect('https://' + req.headers.host  + '/login/');
   }
   next(); 
@@ -70,7 +82,7 @@ function validatePost(req, res, next) {
     }
   } 
   else {
-    res.send({reply:'invalid poast'});
+    res.send({reply:'invalid post'});
   }
 
   next(); 
@@ -79,43 +91,85 @@ function validatePost(req, res, next) {
 
 //..................Handle Login Post Request.................
 function loginPost(req, res, next) {
+  var username = req.body.username,
+      password = req.body.password;
+      
+  
+  /*//make sure user session vars are defined 
+  if(!req.session.userStatus) {
+    res.session.userStatus = 'loggedOut';
+  }
+  if(!req.session.user){
+    res.session.user = null;
+  }
+  */
 
-  // if this is a logIn post request
+  //if this is a logIn post request
   if(req.body.postId === 'logIn') {
-
-    //check the usrname and password
-    auth.checkCredentials(req.body.username, req.body.password, function(status, username) {
-      //if they're valid make a new session
-      auth.makeSession(username, function(session) {
-        if(status === 'user validated') {
-          //send cookie with sessionId
-          res.cookie('sessionId', session.id, {maxAge: 3600000, httpOnly: true});
-          res.send('user validated');
-        } 
-        else {
-          //reply with invalid login
-          res.send('invalid login'); 
-        }
-      });
-    });
-  } 
+    
+    //look up user in database
+    User.find({username: username}, function(error, userData) {
+      //does the user exist
+      if(userData.length === 0) {
+        console.log('user not found')
+        res.send('invalid login');
+      }
+      else {
+        user = userData[0]; 
+        //check the password 
+        bcrypt.compare(password, user.passHash, function(err, hashRes) {
+           if(hashRes === true) { 
+              req.session.userStatus = 'loggedIn'; 
+              req.session.user = username; 
+              res.send('user validated')                
+           } 
+           else {
+             console.log('invalid password');
+             res.send('invalid login'); 
+           }
+        });
+      }
+    }); 
+  }
 
   //if this is a registration post request
   if(req.body.postId === 'register') {
-    //attempt to add the credentials to the database
-    auth.addCredentials(req.body.username, req.body.password, function(status) {
-      //user was added
-      if(status === 'user added') {
-        res.send('user added'); 
-      } 
-      //could not add user, usrname already exist
-      else if (status === 'user taken') {
+  
+    //check if username exist
+    User.find({username: username}, function(error, userData){
+      
+      //if it doesn't exist then add it           
+      if(userData.length === 0) {
+        user = new User(); 
+        user.username = username;
+        
+        //generate a salt
+        bcrypt.genSalt(10, function(err, salt) {
+
+            //when salt is done hash the password
+            bcrypt.hash(password, salt, function(err, hash) {
+                
+                //when hash is done store new credentials in db
+                user.passHash = hash; 
+                user.save(function (err) {
+                  if(!err) {
+                    res.send('user added');
+                    return; 
+                  }
+                });
+            });
+        });
+      }
+      //otherwise user already exist
+      else {
         res.send('user taken');
+        return; 
       }
 
-    }); 
+    });
 
   }
+
 }
 
 
@@ -123,23 +177,19 @@ function loginPost(req, res, next) {
 //..............The Express Stack.....................
 app.use(express.logger('dev'));
 app.use(requireHTTPS);
-app.use(express.cookieParser()); 
 app.use(express.json());
+app.use(express.cookieParser()); 
 app.use(express.session(sessionOptions));
 
 app.use('/login', express.static('login/'));
-
 app.post('/*', validatePost); 
+
 app.post('/login', loginPost);
 app.use(requireAuth); 
 
 app.use('/', express.static('enigmaX/'));
-
 app.use('/ajax', express.static('ajax/'));
 app.post('/ajax', ajaxPost); 
-
-
-
 
 
 
