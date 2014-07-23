@@ -41,7 +41,7 @@ function requireHTTPS(req, res, next) {
     if (!req.secure) {
         //FYI this should work for local development as well
         //return res.redirect('https://' + req.get('host') + req.url);
-        return res.redirect('https://72.47.189.109:8888' + req.url);
+        return res.redirect('https://' + req.host + ':8888' + req.url);
     }
     next();
 }
@@ -102,7 +102,7 @@ function loginPost(req, res, next) {
     User.find({username: username}, function(error, userData) {
       //does the user exist
       if(userData.length === 0) {
-        console.log('user not found')
+        console.log('user not found');
         res.send('invalid login');
       }
       else {
@@ -112,7 +112,7 @@ function loginPost(req, res, next) {
            if(hashRes === true) { 
               req.session.userStatus = 'loggedIn'; 
               req.session.user = username; 
-              res.send('user validated')                
+              res.send('user validated');                
            } 
            else {
              console.log('invalid password');
