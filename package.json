@@ -1,12 +1,15 @@
 {
-  "name": "application-name",
+  "name": "server",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "3.4.7",
-    "jade": "*"
+    "bcryptjs": "*",
+    "connect-mongo": "*",
+    "mongoose": "*",
+    "node-force-domain": "*"
   }
 }

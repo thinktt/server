@@ -5,9 +5,7 @@ var fs = require('fs');
 var bcrypt = require('bcryptjs');
 var MongoStore = require('connect-mongo')(express);
 var mongoose = require('mongoose'); 
-var bcrypt = require('bcryptjs');
 var forceDomain = require('node-force-domain');
-
 
 var app = express(); 
 
