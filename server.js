@@ -6,6 +6,7 @@ var bcrypt = require('bcryptjs');
 var MongoStore = require('connect-mongo')(express);
 var mongoose = require('mongoose'); 
 var bcrypt = require('bcryptjs');
+var forceDomain = require('node-force-domain');
 
 
 var app = express(); 
@@ -167,7 +168,13 @@ function loginPost(req, res, next) {
 
 //..............The Express Stack.....................
 app.use(express.logger('dev'));
-app.use(requireHTTPS);
+app.use(forceDomain({
+    hostname: 'thinktt.org', 
+    port: 8888,  
+    protocol: 'https',
+    type: 'permanent'
+  }));
+//app.use(requireHTTPS);
 app.use(express.json());
 app.use(express.cookieParser()); 
 app.use(express.session(sessionOptions));
