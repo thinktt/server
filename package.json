@@ -11,5 +11,8 @@
     "connect-mongo": "*",
     "mongoose": "*",
     "node-force-domain": "*"
+  },
+  "engines": {
+    "node": "0.10.x"
   }
 }
