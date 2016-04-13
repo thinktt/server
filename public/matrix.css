@@ -1,5 +1,23 @@
 /*basic reset*/
 * {margin: 0; padding: 0;}
 /*adding a black bg to the body to make things clearer*/
-body {background: black;}
+@font-face {
+  font-family: 'matrix';
+  src: url('fonts/matrix.eot'); /* IE9 Compat Modes */
+  src: url('fonts/matrix.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('fonts/matrix.woff2') format('woff2'), /* Super Modern Browsers */
+    url('fonts/matrix.woff') format('woff'), /* Pretty Modern Browsers */
+    url('fonts/matrix.ttf')  format('truetype'), /* Safari, Android, iOS */
+    url('fonts/matrix.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
+
+
+body {
+  color: white;
+  background: black;
+  font-family: 'matrix';
+}
 canvas {display: block;}
+
+
+

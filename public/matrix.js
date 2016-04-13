@@ -7,12 +7,12 @@ c.height = window.innerHeight;
 c.width = window.innerWidth;
 
 //chinese characters - taken from the unicode charset
-var chinese = "田由甲申甴电甶男甸甹町画甼甽甾甿畀畁畂畃畄畅畆畇畈畉畊畋界畍畎畏畐畑";
+var chinese = "abcdefghijklmnopqrstuvwxyz0123456789$+-/=%\"'#&-(),.;:?!\\|{}><[]^~ ";
 console.log(chinese);
 //converting the string into an array of single characters
 chinese = chinese.split("");
 
-var font_size = 15;
+var font_size = 17
 var columns = c.width/font_size; //number of columns for the rain
 //an array of drops - one per column
 var drops = [];
@@ -30,7 +30,7 @@ function draw()
 	ctx.fillRect(0, 0, c.width, c.height);
 	
 	ctx.fillStyle = "#0F0"; //green text
-	ctx.font = font_size + "px arial";
+	ctx.font = font_size + "px matrix";
 	//looping over drops
 	for(var i = 0; i < drops.length; i++)
 	{
@@ -49,7 +49,7 @@ function draw()
 	}
 }
 
-setInterval(draw, 33);
+setInterval(draw, 50);
 
 
 
