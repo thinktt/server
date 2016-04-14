@@ -8,6 +8,7 @@ c.width = window.innerWidth;
 
 //chinese characters - taken from the unicode charset
 var chinese = "abcdefghijklmnopqrstuvwxyz0123456789$+-/=%\"'#&-(),.;:?!\\|{}><[]^~ ";
+//chinese = chinese + "♆☢♗☯☠✈♞❂☭✂☏☾♠✿☮❉♕✪♙☸☹✸♬★♖☂";
 console.log(chinese);
 //converting the string into an array of single characters
 chinese = chinese.split("");

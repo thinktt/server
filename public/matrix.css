@@ -11,11 +11,23 @@
     url('fonts/matrix.svg#svgFontName') format('svg'); /* Legacy iOS */
 }
 
+@font-face {
+  font-family: 'thinkding';
+  src:url('fonts/thinkding.eot');
+  src:url('fonts/thinkding.eot?#iefix') format('embedded-opentype'),
+    url('fonts/thinkding.woff') format('woff'),
+    url('fonts/thinkding.ttf') format('truetype'),
+    url('fonts/thinkding.svg#thinkding') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  
+}
+
 
 body {
   color: white;
   background: black;
-  font-family: 'matrix';
+  font-family: 'matrix', 'thinkding';
 }
 canvas {display: block;}
 
