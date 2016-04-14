@@ -4,6 +4,7 @@ var path = require('path');
 
 var app = express();
 app.use(express.logger('dev'));
+app.disable('x-powered-by');
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('port', process.env.PORT || 3000);
 
