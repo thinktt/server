@@ -8,8 +8,8 @@ var port = process.env.PORT || 3000;
 var securePort = process.env.SECURE_PORT || 3443
 
 var sslOptions = {
-  key: fs.readFileSync('../cert/server.key'),
-  cert: fs.readFileSync('../cert/server.crt'),
+  key: fs.readFileSync('../cert/privkey.pem'),
+  cert: fs.readFileSync('../cert/cert.pem'),
 };
 
 app.use(express.logger('dev'));
